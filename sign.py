@@ -4,32 +4,38 @@ import requests
 EMAIL = os.environ["BALL_EMAIL"]
 PASSWORD = os.environ["BALL_PASSWORD"]
 
-session = requests.Session()
+s = requests.Session()
 
 headers = {
     "User-Agent": "Mozilla/5.0"
 }
 
 # 登录
-login = session.post(
+login = s.post(
     "https://bbs.ball.stream/api/auth/login",
     json={
         "login": EMAIL,
         "password": PASSWORD
     },
-    headers=headers,
-    timeout=30
+    headers=headers
 )
 
-print("登录结果：")
+print("=== LOGIN ===")
 print(login.text)
 
+print("=== COOKIES ===")
+print(s.cookies.get_dict())
+
 # 签到
-checkin = session.post(
+checkin = s.post(
     "https://bbs.ball.stream/api/checkin",
-    headers=headers,
-    timeout=30
+    headers={
+        "User-Agent": "Mozilla/5.0",
+        "Referer": "https://bbs.ball.stream/?v=checkin",
+        "Origin": "https://bbs.ball.stream"
+    }
 )
 
-print("签到结果：")
-print(checkin.text)
+print("=== CHECKIN ===")
+print("Status:", checkin.status_code)
+print(checkin.text[:1000])
